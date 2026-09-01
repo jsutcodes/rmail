@@ -4,6 +4,9 @@
 //! mobile (UniFFI) shells. This currently contains only a bare-bones
 //! skeleton; sync logic, database schema, and auth will be added here.
 
+pub mod api;
+pub mod db;
+pub mod services;
 /// Placeholder entry point for the core library.
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
