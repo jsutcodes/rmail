@@ -63,7 +63,7 @@ impl DbManager {
                 subject: row.get(3)?,
                 body_preview: row.get(4)?,
                 is_read: row.get::<_, i32>(5)? == 1,
-                received_at,
+                received_at: received_at,
             })
         })?;
         
