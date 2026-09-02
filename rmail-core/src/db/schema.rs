@@ -8,13 +8,13 @@ CREATE TABLE IF NOT EXISTS credentials (
     );
 
 CREATE TABLE IF NOT EXISTS emails (
-    id TEXT PRIMARY KEY;
+    id TEXT PRIMARY KEY,
     conversation_id TEXT NOT NULL,
     from_address TEXT NOT NULL,
     subject TEXT NOT NULL,
     body_preview TEXT,
     is_read INTEGER NOT NULL DEFAULT 0,
-    received_At TEXT NOT NULL
+    received_at TEXT NOT NULL
     );
 
 CREATE INDEX IF NOT EXISTS idx_email_coversation ON emails(conversation_id);

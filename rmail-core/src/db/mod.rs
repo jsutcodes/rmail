@@ -18,7 +18,7 @@ impl DbManager {
         let conn = Connection::open(db_path)?;
 
         //Enables Write ahead logging (WAL) for faster perfomance and concurrency
-        conn.execute_batch(queries::ENABLE_WAL)?;
+        conn.execute_batch(queries::ENABLE_WAL_SQL)?;
         conn.execute_batch(schema::CREATE_TABLES_SQL)?;
 
         Ok(Self {
@@ -28,10 +28,10 @@ impl DbManager {
     }
 
     // Insert or Update
-    pub fn upsert_email(&self, email: &models::LocalEmail) -> Result<()> {
+    pub fn upsert_email(&self, email: &models::CachedEmail) -> Result<()> {
         let conn = self.conn.lock().unwrap();
         conn.execute(
-            queries::UPSERT_EMAIL,
+            queries::UPSERT_EMAIL_SQL,
             params![
                 email.id,
                 email.conversation_id,
@@ -48,11 +48,11 @@ impl DbManager {
     // Fetch email for the primary thrad list (Gmail-style view)
     pub fn get_cached_emails(&self) -> Result<Vec<models::CachedEmail>> {
         let conn = self.conn.lock().unwrap();
-        let mut stmt = conn.prepare(queries::FETCH_INBOX);
+        let mut stmt = conn.prepare(queries::FETCH_INBOX_SQL)?;
 
         let email_itr = stmt.query_map([], |row| {
             let date_str: String = row.get(6)?;
-            let recieved_at = chrono::DateTime::parse_from_rfc3339(&date_str)
+            let received_at = chrono::DateTime::parse_from_rfc3339(&date_str)
                 .unwrap_or_default()
                 .with_timezone(&chrono::Utc);
 
@@ -62,14 +62,14 @@ impl DbManager {
                 from_address: row.get(2)?,
                 subject: row.get(3)?,
                 body_preview: row.get(4)?,
-                is_read: row.get<<_, i32>>(5)? == 1,
+                is_read: row.get::<_, i32>(5)? == 1,
                 received_at,
             })
         })?;
         
         let mut emails = Vec::new();
         for email in email_itr {
-            email.push(email?);
+            emails.push(email?);
         }
         Ok(emails)
     }

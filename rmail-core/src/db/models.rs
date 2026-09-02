@@ -1,5 +1,4 @@
-import_chrono::DateTime;
-import_chrono::Utc;
+use chrono::{DateTime, Utc};
 
 
 // Represent Email Thread cached locally
@@ -13,7 +12,6 @@ pub struct CachedEmail {
     pub is_read: bool,
     pub received_at: DateTime<Utc>,
 }
-
 
 // Represent Encrypted credentials 
 #[derive(Debug, Clone)]
