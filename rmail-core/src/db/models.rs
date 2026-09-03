@@ -21,3 +21,20 @@ pub struct AccountCredentials{
     pub refresh_token: bool,
     pub expires_at: DateTime<Utc>,
 }
+
+// Represent Label 
+#[derive(Debug, Clone)]
+pub struct Label {
+    pub id: String,         // Internal unique ID
+    pub name: String,       // e.g., "Invoices", "Work", "Social"
+    pub color: Option<String>, // Outlook categories support custom colors!
+}
+
+// Mapping cachedEmail and labels 
+#[derive(Debug, Clone)]
+pub struct EmailLabel {
+    pub email_id: String,   // Foreign key to CachedEmail.id
+    pub label_id: String,   // Foreign key to Label.id
+}
+
+
