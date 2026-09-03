@@ -14,3 +14,17 @@ pub const FETCH_INBOX_SQL: &str = "
     FROM emails
     ORDER BY received_at DESC
 ";
+
+pub const UPSERT_LABEL_SQL: &str = "
+    INSERT INTO labels (id, name, color)
+    VALUES (?1, ?2, ?3)
+    ON CONFLICT(id) DO UPDATE SET
+    name = excluded.name,
+    color = excluded.color
+";
+
+pub const FETCH_LABELS_SQL: &str = "
+    SELECT id, name, color
+    FROM labels
+    ORDER BY name ASC
+";

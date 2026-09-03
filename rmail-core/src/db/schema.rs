@@ -20,14 +20,14 @@ CREATE TABLE IF NOT EXISTS emails (
 CREATE INDEX IF NOT EXISTS idx_email_coversation ON emails(conversation_id);
 
 
-CREATE TABLE labels (
+CREATE TABLE IF NOT EXISTS labels (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     color TEXT
 );
 
-CREATE TABLE email_label (
-    email_id TEXT REFERENCES cached_emails(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS email_label (
+    email_id TEXT REFERENCES emails(id) ON DELETE CASCADE,
     label_id TEXT REFERENCES labels(id) ON DELETE CASCADE,
     PRIMARY KEY (email_id, label_id)
 );

@@ -4,6 +4,40 @@ A blazing-fast, lightweight desktop and mobile email client built in **Rust**. T
 
 ---
 
+## ⌨️ `rmail-tui`: Terminal UI
+
+A terminal client (`rmail-tui`) is included alongside the Tauri/mobile shells, with a Copilot-CLI-style layout: a row of tabs (**Inbox**, **Labels**, **Calendar**, **Account**) across the top, switched with `Tab`/`Shift+Tab` or the arrow keys, and a status/help bar at the bottom.
+
+### 1. Register an Azure AD app (one-time)
+
+Outlook login uses the OAuth 2.0 Authorization Code + PKCE flow against the Microsoft identity platform, so it needs an app registration:
+
+1. In the [Azure Portal](https://portal.azure.com) go to **Azure Active Directory → App registrations → New registration**.
+2. Name it (e.g. "RMail"), and under **Supported account types** pick whichever fits your tenant (work/school accounts, or work + personal).
+3. Under **Redirect URI**, choose platform **"Mobile and desktop applications"** and add `http://localhost:8733/callback`.
+4. After creation, go to **Authentication** and enable **"Allow public client flows"** (this app uses no client secret).
+5. Under **API permissions**, add these delegated Microsoft Graph permissions: `User.Read`, `Mail.Read`, `Mail.ReadWrite`, `Mail.Send`, `Calendars.Read`, `MailboxSettings.Read`, `offline_access`.
+6. Copy the **Application (client) ID** from the Overview page.
+
+### 2. Configure environment variables
+
+```sh
+export RMAIL_CLIENT_ID="<application-client-id>"
+# Optional overrides:
+export RMAIL_TENANT_ID="common"      # or your tenant's GUID / domain
+export RMAIL_REDIRECT_PORT="8733"    # must match the redirect URI above
+```
+
+### 3. Run it
+
+```sh
+cargo run -p rmail-tui
+```
+
+Press `l` on the **Account** tab to sign in (opens your browser); tokens are cached in the OS keychain. Press `r` on **Inbox**/**Labels**/**Calendar** to sync that tab from Microsoft Graph - synced mail and labels are cached locally in SQLite (`~/.config/rmail/cache.db`) for instant, offline-first access on the next launch. Press `q` to quit.
+
+---
+
 ## 🔎 Gmail Features vs. Outlook (Architecture Mapping)
 
 While Outlook is built around a traditional physical filing cabinet metaphor (one email lives in one folder), this app uses a database-tagging metaphor to achieve true Gmail functionality on top of an Outlook backend.

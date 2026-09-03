@@ -73,4 +73,34 @@ impl DbManager {
         }
         Ok(emails)
     }
+
+    // Insert or update a label (Outlook category) in the local cache.
+    pub fn upsert_label(&self, label: &models::Label) -> Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            queries::UPSERT_LABEL_SQL,
+            params![label.id, label.name, label.color],
+        )?;
+        Ok(())
+    }
+
+    // Fetch cached labels, ordered by name, for offline display.
+    pub fn get_cached_labels(&self) -> Result<Vec<models::Label>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare(queries::FETCH_LABELS_SQL)?;
+
+        let label_itr = stmt.query_map([], |row| {
+            Ok(models::Label {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                color: row.get(2)?,
+            })
+        })?;
+
+        let mut labels = Vec::new();
+        for label in label_itr {
+            labels.push(label?);
+        }
+        Ok(labels)
+    }
 }
